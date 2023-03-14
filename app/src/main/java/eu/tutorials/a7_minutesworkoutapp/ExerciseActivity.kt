@@ -1,5 +1,10 @@
 package eu.tutorials.a7_minutesworkoutapp
 
+import android.media.AudioManager
+import android.media.MediaPlayer
+import android.media.ToneGenerator
+import android.media.ToneGenerator.MAX_VOLUME
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -37,6 +42,8 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var binding:ActivityExerciseBinding? = null
 
     private var tts : TextToSpeech? = null
+    private var mediaPlayer : MediaPlayer? = null
+    var toneGenerator : ToneGenerator? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //inflate the layout
@@ -69,6 +76,19 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
      * Function is used to set the timer for REST.
      */
     private fun setupRestView() {
+
+        try {
+            /*var soundURI = Uri.parse(
+                "android:resource://eu.tutorials.a7_minutesworkoutapp/"+R.raw.app_src_main_res_raw_press_start)
+            mediaPlayer = MediaPlayer.create(applicationContext,soundURI)
+            mediaPlayer?.isLooping = false
+            mediaPlayer?.start()*/
+            toneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, MAX_VOLUME)
+            toneGenerator?.startTone(ToneGenerator.TONE_PROP_BEEP, 200)
+
+        }catch (e : java.lang.Exception){
+            e.printStackTrace()
+        }
 // TODO (Step 3- changing the upcoming exercise label and name visibility.)
         binding?.flRestView?.visibility = View.VISIBLE
         binding?.tvTitle?.visibility = View.VISIBLE
@@ -226,6 +246,10 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         if(tts != null){
             tts!!.stop()
             tts!!.shutdown()
+        }
+        if(toneGenerator != null){
+            toneGenerator!!.stopTone()
+            toneGenerator!!.release()
         }
         binding = null
     }
