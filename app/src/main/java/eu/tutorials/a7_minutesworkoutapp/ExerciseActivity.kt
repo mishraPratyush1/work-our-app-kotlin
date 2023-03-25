@@ -1,5 +1,6 @@
 package eu.tutorials.a7_minutesworkoutapp
 
+import android.annotation.SuppressLint
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.ToneGenerator
@@ -12,6 +13,7 @@ import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
 import eu.tutorials.a7_minutesworkoutapp.databinding.ActivityExerciseBinding
 import java.util.*
 import kotlin.collections.ArrayList
@@ -32,7 +34,7 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var exerciseTimer: CountDownTimer? = null // Variable for Exercise Timer and later on we will initialize it.
     private var exerciseProgress = 0 // Variable for the exercise timer progress. As initial value the exercise progress is set to 0. As we are about to start.
     // END
-    private var exerciseTimerDuration:Long = 30
+    private var exerciseTimerDuration:Long = 1
     // The Variable for the exercise list and current position of exercise here it is -1 as the list starting element is 0
     // START
     private var exerciseList: ArrayList<ExerciseModel>? = null // We will initialize the list later.
@@ -44,6 +46,9 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var tts : TextToSpeech? = null
     private var mediaPlayer : MediaPlayer? = null
     var toneGenerator : ToneGenerator? = null
+
+    var adapter : ExerciseStatusAdapter? = null
+    private var restTimerDuration : Long = 1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //inflate the layout
@@ -67,8 +72,15 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         tts = TextToSpeech(this,this)
         // END
         setupRestView()
+        setUpExerciseStatusRecyclerView()
     }
 
+    private fun setUpExerciseStatusRecyclerView(){
+        binding?.rvExerciseStatus?.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false)
+
+        adapter = ExerciseStatusAdapter(exerciseList!!)
+        binding?.rvExerciseStatus?.adapter = adapter
+    }
 
     //Setting up the Get Ready View with 10 seconds of timer
     //START
@@ -133,7 +145,8 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
          *   {#onTick(long)} callbacks.
          */
         // Here we have started a timer of 10 seconds so the 10000 is milliseconds is 10 seconds and the countdown interval is 1 second so it 1000.
-        restTimer = object : CountDownTimer(10000, 1000) {
+
+        restTimer = object : CountDownTimer(restTimerDuration * 1000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 restProgress++ // It is increased by 1
                 binding?.progressBar?.progress = 10 - restProgress // Indicates progress bar progress
@@ -141,10 +154,13 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                     (10 - restProgress).toString()  // Current progress is set to text view in terms of seconds.
             }
 
+            @SuppressLint("NotifyDataSetChanged")
             override fun onFinish() {
                 // When the 10 seconds will complete this will be executed.
                 currentExercisePosition++
-           setupExerciseView()
+                    exerciseList!![currentExercisePosition].setIsSelected(true)
+                adapter!!.notifyDataSetChanged()
+                setupExerciseView()
             }
         }.start()
     }
@@ -207,7 +223,12 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                binding?.tvTimerExercise?.text = (exerciseTimerDuration.toInt() - exerciseProgress).toString()
             }
 
+            @SuppressLint("NotifyDataSetChanged")
             override fun onFinish() {
+                exerciseList!![currentExercisePosition].setIsSelected(false)
+                exerciseList!![currentExercisePosition].setIsCompleted(true)
+                //reset the recyclerview with the data change
+                adapter!!.notifyDataSetChanged()
                 // Updating the view after completing the 30 seconds exercise
                 // START
                 if (currentExercisePosition < exerciseList?.size!! - 1) {
