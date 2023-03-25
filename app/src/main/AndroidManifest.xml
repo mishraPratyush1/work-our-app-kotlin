@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="eu.tutorials.a7_minutesworkoutapp">
+
     <queries>
         <intent>
             <action android:name="android.intent.action.TTS_SERVICE" />
@@ -15,10 +16,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.7MinutesWorkoutApp">
         <activity
-            android:name=".ExerciseActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/Theme.MaterialComponents.NoActionBar"
-            android:exported="true" />
+            android:name=".FinishActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ExerciseActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.MaterialComponents.NoActionBar" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

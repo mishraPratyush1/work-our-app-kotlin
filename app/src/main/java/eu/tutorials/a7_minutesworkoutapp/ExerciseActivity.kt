@@ -1,6 +1,7 @@
 package eu.tutorials.a7_minutesworkoutapp
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.ToneGenerator
@@ -225,21 +226,19 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
             @SuppressLint("NotifyDataSetChanged")
             override fun onFinish() {
-                exerciseList!![currentExercisePosition].setIsSelected(false)
-                exerciseList!![currentExercisePosition].setIsCompleted(true)
-                //reset the recyclerview with the data change
-                adapter!!.notifyDataSetChanged()
+
                 // Updating the view after completing the 30 seconds exercise
                 // START
                 if (currentExercisePosition < exerciseList?.size!! - 1) {
+                    exerciseList!![currentExercisePosition].setIsSelected(false)
+                    exerciseList!![currentExercisePosition].setIsCompleted(true)
+                    //reset the recyclerview with the data change
+                    adapter!!.notifyDataSetChanged()
                     setupRestView()
                 } else {
-
-                    Toast.makeText(
-                        this@ExerciseActivity,
-                        "Congratulations! You have completed the 7 minutes workout.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    finish()
+                    val intent = Intent(this@ExerciseActivity,FinishActivity::class.java)
+                    startActivity(intent)
                 }
                 // END
             }
