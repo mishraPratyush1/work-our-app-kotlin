@@ -1,6 +1,7 @@
 package eu.tutorials.a7_minutesworkoutapp
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Intent
 import android.media.AudioManager
 import android.media.MediaPlayer
@@ -16,6 +17,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import eu.tutorials.a7_minutesworkoutapp.databinding.ActivityExerciseBinding
+import eu.tutorials.a7_minutesworkoutapp.databinding.DialogCustomBackConfirmationBinding
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -64,7 +66,7 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
         }
         binding?.toolbarExercise?.setNavigationOnClickListener {
-            onBackPressed()
+            customDialogForBackButton()
         }
         //Initializing and Assigning a default exercise list to our list variable
         // START
@@ -76,6 +78,28 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         setUpExerciseStatusRecyclerView()
     }
 
+    private fun customDialogForBackButton() {
+        val customDialog = Dialog(this)
+        val dialogBinding = DialogCustomBackConfirmationBinding.inflate(layoutInflater)
+
+        customDialog.setContentView(dialogBinding.root)
+        customDialog.setCanceledOnTouchOutside(false)
+
+        dialogBinding.tvYes.setOnClickListener {
+            this@ExerciseActivity.finish()
+            customDialog.dismiss()
+        }
+
+        dialogBinding.tvNo.setOnClickListener {
+            customDialog.dismiss()
+        }
+        customDialog.show()
+    }
+
+    override fun onBackPressed() {
+        customDialogForBackButton()
+        //super.onBackPressed()
+    }
     private fun setUpExerciseStatusRecyclerView(){
         binding?.rvExerciseStatus?.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false)
 
